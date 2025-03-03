@@ -4,12 +4,10 @@ library(ape) # for phylo objects
 library(tidyr)
 source("get_subtrees.R")
 
-setwd("D:/Virology/RNA_viruses/Compare_trees")
-
 subtrees = get_subtrees("trees.txt")
 
-tree1_name = "D:/Virology/RNA_viruses/Picornaviruses/virus-recombination/Trees/MCC/Asia1_P1.tree"
-tree1_name = "norovirus_rdrp_g2_yearonly_colnodes.tree"
+tree1_name = "tree1.tree"
+tree1_name = "tree2.tree"
 tree1 = read.beast(tree1_name)
 
 p <- ggtree(tree1,mrsd="2025-01-01")
