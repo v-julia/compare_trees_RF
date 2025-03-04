@@ -10,7 +10,7 @@ This script finds common subtrees between two trees and calculates median of the
 - *_commontrees.txt - text file with common subtrees in newick format
 - *_heights.txt - ages of common subtrees
 
-Importantly, the trees' taxa should not necesserily coincide. 
+Importantly, the trees' taxa should not necessarily coincide. 
 
 Usage
 ```
