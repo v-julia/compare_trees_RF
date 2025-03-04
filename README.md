@@ -1,8 +1,16 @@
 # compare_trees_RF
 compare phylogenetic trees and calculate TMRCAs of recombinant forms 
 
+Functions for identifing and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
+
 
 ## get_RF_halflife.py
+
+This script finds common subtrees between two trees and calculates median of their MRCA ages. The subtrees' tMRCA are extracted from the first tree which should be a time-scaled phylogeny produced by BEAST software. The second tree's format could be nexus or newick. Output:
+- *_commontrees.txt - text file with common subtrees in newick format
+- *_heights.txt - ages of common subtrees
+
+Importantly, the trees' taxa should not necesserily coincide. 
 
 Usage
 ```
@@ -21,4 +29,9 @@ options:
 
 ## get_subtrees.R
 
+Helper functions for parsing *_commontrees.txt
+
+
 ## plot_trees_test.R
+
+Example of visualization.
