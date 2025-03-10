@@ -68,9 +68,11 @@ Hash (sha256) is calculated for string that includes all bipartitions in subtree
 Returns dictionary with hashes and corresponding subtrees in newick format.
 '''
 
-def add_hashes(tree):
+def add_hashes(tree, timescaled=False):
     tree_hashes = {}
     biparts = []
+    if timescaled:
+        subtree_heights = {}
     for nd in tree.postorder_node_iter():
         if nd.is_leaf():
             continue
@@ -91,7 +93,16 @@ def add_hashes(tree):
             #if "MK073889_USA_human_2016_GII.4_GII.P4" in nd._as_newick_string(edge_lengths=None):
             #    #print(nd._as_newick_string(edge_lengths=None))
             #    biparts.append(stri_bipart)
+            
+            if timescaled:
+                min_leaf_height = 100
+                for leaf in nd.leaf_iter():
+                    if leaf.height < min_leaf_height:
+                        min_leaf_height = leaf.height
+                subtree_heights[nd.hash] = min_leaf_height
 
+    if timescaled:
+        return tree_hashes, subtree_heights
     return tree_hashes
 
 '''
@@ -110,7 +121,7 @@ Output:
 heights - list with heights of subtrees common between tree1 and tree2
 
 '''
-def get_common_subtrees(tree1, hashes_tree2, posterior_thr = None):
+def get_common_subtrees(tree1, subtree_times1, hashes_tree2, posterior_thr = None):
     heights = []
     common_subtrees = []
     stack = [tree1.seed_node]
@@ -124,12 +135,13 @@ def get_common_subtrees(tree1, hashes_tree2, posterior_thr = None):
                 if node.posterior > posterior_thr:
                     #yield node.height
                     #print(node.height)
-                    heights.append(node.height)
+                    heights.append(node.height - subtree_times1[node.hash])
                     common_subtrees.append(hashes_tree2[node.hash])
                 else:
                     stack.extend(n for n in reversed(node._child_nodes))
             else:
-                heights.append(node.height)
+                #print(str(node.height) + '-' + str(subtree_times1[node.hash]))
+                heights.append(node.height - subtree_times1[node.hash])
                 common_subtrees.append(hashes_tree2[node.hash])
         else:
             stack.extend(n for n in reversed(node._child_nodes))
@@ -161,7 +173,7 @@ if __name__ == '__main__':
             print("Couldn't read tree2!")
             sys.exit(1)
     print("Calculating hashes for tree 1...")
-    hashes_tree1 = add_hashes(tree1)
+    hashes_tree1, subtree_times1 = add_hashes(tree1, timescaled=True)
     print("Done")
 
     print("Calculating hashes for tree 2...")
@@ -170,9 +182,9 @@ if __name__ == '__main__':
 
     print("Comparing trees...")
     if args.posterior_threshold:
-        heights, subtrees = get_common_subtrees(tree1, hashes_tree2,float(args.posterior_threshold))
+        heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2,float(args.posterior_threshold))
     else:
-        heights, subtrees = get_common_subtrees(tree1, hashes_tree2)
+        heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2)
     print("The median height of common subtrees is {}".format(round(np.median(heights),4)))
     
     
