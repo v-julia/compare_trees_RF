@@ -1,7 +1,7 @@
 #Finds taxa names in string in newick format
 find_taxa = function(stri){
 
-  matches = gregexpr("[A-Za-z0-9_./]+",stri)
+  matches = gregexpr("[A-Za-z0-9_./-]+",stri)
   
   if (matches[[1]][1] != -1 ){
     return(regmatches(stri, matches)[[1]])
