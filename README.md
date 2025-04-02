@@ -22,8 +22,13 @@ options:
                         Path to time tree in nexus format inferred using BEAST software
   -tree2 TREE2, --tree2 TREE2
                         Path to phylogenetic tree in nwk or nexus format
+  -method METHOD, --method METHOD
+                        Method for determining recombinant forms. 'subtrees', 'bipartitions' or 'all'
   -pthr POSTERIOR_THRESHOLD, --posterior_threshold POSTERIOR_THRESHOLD
-                        Threshold for posterior values of nodes that to count. Ranges from 0 to 1.
+                        Threshold for posterior values of nodes to count. Ranges from 0 to 1.
+  -bthr BOOTSTRAP_THRESHOLD, --bootstrap_threshold BOOTSTRAP_THRESHOLD
+                        Threshold for bootstrap values of branches to count (for 'bipartitions' method). Ranges from 0
+                        to 100.
 ```
 
 
