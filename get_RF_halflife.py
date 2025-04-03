@@ -254,7 +254,7 @@ if __name__ == '__main__':
                         help="Path to phylogenetic tree in nwk or nexus format", required=True)
     parser.add_argument("-method", "--method", type=str,
                         help="Method for determining recombinant forms. 'subtrees', 'bipartitions' or 'all'.\
-                        If method==all, outputs a table with numbers of coinciding partitions and subtrees, ages of RFs half-lives", required=True)
+                        If method==all, outputs a table with numbers of coinciding partitions and subtrees, and ages of RFs half-lives", required=True)
     parser.add_argument("-thr", "--posterior_threshold", type=float,
                         help="Threshold for posterior values of nodes to count. Ranges from 0 to 1.")
     parser.add_argument("-thr2", "--threshold2", type=float,
@@ -282,6 +282,7 @@ if __name__ == '__main__':
         try:
             tree2 = dpy.Tree.get_from_path(args.tree2, 'newick')
             tree2_format = 'newick'
+            tree2.reroot_at_midpoint()
         except:
             print("Couldn't read tree2!")
             sys.exit(1)
