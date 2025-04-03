@@ -253,24 +253,35 @@ if __name__ == '__main__':
     parser.add_argument("-tree2", "--tree2", type=str,
                         help="Path to phylogenetic tree in nwk or nexus format", required=True)
     parser.add_argument("-method", "--method", type=str,
-                        help="Method for determining recombinant forms. 'subtrees', 'bipartitions' or 'all' ", required=True)
-    parser.add_argument("-pthr", "--posterior_threshold", type=float,
+                        help="Method for determining recombinant forms. 'subtrees', 'bipartitions' or 'all'.\
+                        If method==all, outputs a table with numbers of coinciding partitions and subtrees, ages of RFs half-lives", required=True)
+    parser.add_argument("-thr", "--posterior_threshold", type=float,
                         help="Threshold for posterior values of nodes to count. Ranges from 0 to 1.")
-    parser.add_argument("-bthr", "--bootstrap_threshold", type=float,
-                        help="Threshold for bootstrap values of branches to count (for 'bipartitions' method). Ranges from 0 to 100.")
+    parser.add_argument("-thr2", "--threshold2", type=float,
+                        help="Threshold for bootstrap values or posterior values of branches to count (for 'bipartitions' method). \
+                        Bootstrap values range from 0 to 100. Posterior probabilities range from 0 to 1")
+    parser.add_argument("-out", "--output_dir", type=str,
+                        help="Path to output directory")
 
     args = parser.parse_args()
+
+    if args.output_dir == None:
+        args.output_dir = os.getcwd()
 
     tree1 = dpy.Tree.get_from_path(args.tree_beast, 'nexus')
     print("Getting annotation of tree nodes...")
     tree1 = parse_beast_tree_node_info(tree1)
     print("Done")
     
+    
     try:
         tree2 = dpy.Tree.get_from_path(args.tree2, 'nexus')
+        tree2_format = 'nexus'
+        tree2 = parse_beast_tree_node_info(tree2)
     except:
         try:
             tree2 = dpy.Tree.get_from_path(args.tree2, 'newick')
+            tree2_format = 'newick'
         except:
             print("Couldn't read tree2!")
             sys.exit(1)
@@ -285,35 +296,43 @@ if __name__ == '__main__':
         print("Done")
         
         print("Encoding bipartitions for tree 2...")
-        biparts_tree2 = encode_bipartitions(tree2,"newick")
+        if tree2_format == 'newick':
+            biparts_tree2 = encode_bipartitions(tree2,"newick")
+        else:
+            biparts_tree2 = encode_bipartitions(tree2,"nexus")
         print("Done")
         
-        heights_bip, subtrees_bip = get_common_biparts(biparts_tree1, biparts_tree2)
+        heights_bip_nothr, subtrees_bip_nothr = get_common_biparts(biparts_tree1, biparts_tree2)
         
         df = pd.DataFrame(biparts_tree1).T
         df.columns = ['posterior', 'height_raw', 'height_corrected', 'bip', 'subtree']
+        print("Number of bipartitions with posterior > {} in tree1 = {}".format(str(args.posterior_threshold),df[df['posterior']>args.posterior_threshold].shape[0]))
 
-        df_nwk = pd.DataFrame(biparts_tree2).T
-        df_nwk.columns = ['support', 'bip']
-        
-        print("Number of bipartitions with posterior > {} = {}".format(str(args.posterior_threshold),df[df['posterior']>args.posterior_threshold].shape[0]))
-        print("Number of bipartitions with bootstrap > {} = {}".format(str(args.bootstrap_threshold), df_nwk[df_nwk['support']>args.bootstrap_threshold].shape[0]))
-        
-        print("Number of coinciding bipartitions in tree1 and tree2 with no thresholds {}".format(len(subtrees_bip)))
-        print("The median height of common bipartitions with no thresholds is {}".format(round(np.median(heights_bip),4)))
+        if tree2_format == 'newick':
+            df2 = pd.DataFrame(biparts_tree2).T
+            df2.columns = ['support', 'bip']
+            print("Number of bipartitions with bootstrap > {} in tree2 = {}".format(str(args.threshold2), df2[df2['support']>args.threshold2].shape[0]))
+        else:
+            df2 = pd.DataFrame(biparts_tree2).T
+            df2.columns = ['posterior', 'height_raw', 'height_corrected', 'bip', 'subtree']
+            #print(df2)
+            print("Number of bipartitions with posterior > {} in tree2 = {}".format(str(args.threshold2),df2[df2['posterior']>args.threshold2].shape[0]))
+
+        print("Number of coinciding bipartitions in tree1 and tree2 with no thresholds {}".format(len(subtrees_bip_nothr)))
+        print("The median height of common bipartitions with no thresholds is {}".format(round(np.median(heights_bip_nothr),4)))
 
 
-        heights_bip, subtrees_bip = get_common_biparts(biparts_tree1, biparts_tree2, args.posterior_threshold, args.bootstrap_threshold)        
+        heights_bip, subtrees_bip = get_common_biparts(biparts_tree1, biparts_tree2, args.posterior_threshold, args.threshold2)        
         print("Number of coinciding bipartitions in tree1 and tree2 {}".format(len(subtrees_bip)))
         print("The median height of common bipartitions is {}".format(round(np.median(heights_bip),4)))
     
     
     
-        with open(os.path.join(os.getcwd(),tree1_name + '_' + tree2_name + "_commontrees_bip.txt"), 'w') as file:
+        with open(os.path.join(args.output_dir,tree1_name + '_' + tree2_name + "_commontrees_bip.txt"), 'w') as file:
             file.write("\n".join(subtrees_bip) + "\n")
         file.close()
 
-        with open(os.path.join(os.getcwd(), tree1_name + '_' + tree2_name + "_heights_bip.txt"), 'w') as file:
+        with open(os.path.join(args.output_dir, tree1_name + '_' + tree2_name + "_heights_bip.txt"), 'w') as file:
             file.write("\n".join([str(h) for h in heights_bip]) + "\n")
         file.close()
 
@@ -331,14 +350,40 @@ if __name__ == '__main__':
             heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2,float(args.posterior_threshold))
         else:
             heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2)
+
+        print("Number of coinciding subtrees = {}".format(len(subtrees)))
         print("The median height of common subtrees is {}".format(round(np.median(heights),4)))
         
-        with open(os.path.join(os.getcwd(),tree1_name + '_' + tree2_name + "_commontrees.txt"), 'w') as file:
+        with open(os.path.join(args.output_dir,tree1_name + '_' + tree2_name + "_commontrees.txt"), 'w') as file:
             file.write("\n".join(subtrees) + "\n")
         file.close()
 
-        with open(os.path.join(os.getcwd(), tree1_name + '_' + tree2_name + "_heights.txt"), 'w') as file:
+        with open(os.path.join(args.output_dir, tree1_name + '_' + tree2_name + "_heights.txt"), 'w') as file:
             file.write("\n".join([str(h) for h in heights]) + "\n")
         file.close()
-
-
+    if args.method == 'all':
+        if tree2_format == 'nexus':
+            header = "tree1,tree2,bipartitions,bipartitions1 posterior>{},bipartitions2 posterior>{},\
+            coinciding bipartitions no thr,coinciding bipartitions,coinciding subtrees,RF bipartitions no threshold,RF bipartitions,RF subtrees\n".format(args.posterior_threshold,args.threshold2)
+            bip_thr_tree2 = df2[df2['posterior']>args.threshold2].shape[0]
+        else:
+            header = "tree1,tree2,bipartitions,bipartitions1 posterior>{},bipartitions2 bootstrap>{},\
+            coinciding bipartitions no thr,coinciding bipartitions,coinciding subtrees,RF bipartitions no threshold,RF bipartitions,RF subtrees\n".format(args.posterior_threshold,args.threshold2)
+            bip_thr_tree2 = df2[df2['support']>args.threshold2].shape[0]
+        list_values = [tree1_name,
+                            tree2_name,
+                            df.shape[0],
+                            df[df['posterior']>args.posterior_threshold].shape[0],
+                            bip_thr_tree2,
+                            len(subtrees_bip_nothr),
+                            len(subtrees_bip),
+                            len(subtrees),
+                            round(np.median(heights_bip_nothr),4),
+                            round(np.median(heights_bip),4),
+                            round(np.median(heights),4)]
+                            
+        
+        values = ",".join([str(x) for x in list_values]) + '\n'
+        
+        with open(os.path.join(args.output_dir, tree1_name + '_' + tree2_name + "_table.csv"), 'w') as file:
+            file.writelines([header, values])
