@@ -54,12 +54,15 @@ options:
   -tree2 TREE2, --tree2 TREE2
                         Path to phylogenetic tree in nwk or nexus format
   -method METHOD, --method METHOD
-                        Method for determining recombinant forms. 'subtrees', 'bipartitions' or 'all'
-  -pthr POSTERIOR_THRESHOLD, --posterior_threshold POSTERIOR_THRESHOLD
+                        Method for determining recombinant forms. 'subtrees', 'bipartitions' or 'all'. If method==all,
+                        outputs a table with numbers of coinciding partitions and subtrees, and ages of RFs half-lives
+  -thr POSTERIOR_THRESHOLD, --posterior_threshold POSTERIOR_THRESHOLD
                         Threshold for posterior values of nodes to count. Ranges from 0 to 1.
-  -bthr BOOTSTRAP_THRESHOLD, --bootstrap_threshold BOOTSTRAP_THRESHOLD
-                        Threshold for bootstrap values of branches to count (for 'bipartitions' method). Ranges from 0
-                        to 100.
+  -thr2 THRESHOLD2, --threshold2 THRESHOLD2
+                        Threshold for bootstrap values or posterior values of branches to count (for 'bipartitions'
+                        method). Bootstrap values range from 0 to 100. Posterior probabilities range from 0 to 1
+  -out OUTPUT_DIR, --output_dir OUTPUT_DIR
+                        Path to output directory
 ```
 
 
