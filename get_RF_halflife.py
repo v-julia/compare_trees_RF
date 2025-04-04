@@ -224,7 +224,7 @@ subtrees - list with subtrees of common bipartitions in tree1 and tree2
 '''
 
 
-def get_common_biparts(biparts_tree1, biparts_tree2, posterior_thr=None, bootstrap_sup=None):
+def get_common_biparts_old(biparts_tree1, biparts_tree2, posterior_thr=None, bootstrap_sup=None):
     heights = []
     subtrees = []
     for h in biparts_tree1:
@@ -242,7 +242,33 @@ def get_common_biparts(biparts_tree1, biparts_tree2, posterior_thr=None, bootstr
 
     return heights, subtrees
 
+def get_common_biparts(biparts_tree1, biparts_tree2, posterior_thr=None, bootstrap_sup=None):
+    # bipartitions that coincide in two trees
+    biparts_coinc = {}
+    # subtrees for bipartitions that coincide in two trees
+    subtree2hash = {}
 
+    # compare bipartitions
+    for h in biparts_tree1:
+        if posterior_thr!=None and biparts_tree1[h][0] < posterior_thr:
+            continue
+
+        if h in biparts_tree2.keys():
+            if bootstrap_sup!=None and biparts_tree2[h][0] < bootstrap_sup:
+                continue
+            biparts_coinc[h] = biparts_tree1[h]
+            subtree2hash[biparts_tree1[h][4]] = h
+
+    # some bipartitions correspond to nested nodes
+    # we do not consider ages and subtrees for splits of nodes that are descendants of other nodes matching in two trees
+    heights = []
+    subtrees = []
+    for h in biparts_coinc:
+        if len(list(filter(lambda x: biparts_coinc[h][4] in x, subtree2hash.keys()))) < 2:
+            heights.append(biparts_coinc[h][2])
+            subtrees.append(biparts_coinc[h][4])
+
+    return heights, subtrees
 
 
 
@@ -301,33 +327,57 @@ if __name__ == '__main__':
             biparts_tree2 = encode_bipartitions(tree2,"newick")
         else:
             biparts_tree2 = encode_bipartitions(tree2,"nexus")
-        print("Done")
+        print("Done\n")
         
-        heights_bip_nothr, subtrees_bip_nothr = get_common_biparts(biparts_tree1, biparts_tree2)
+        biparts_values = []
         
-        df = pd.DataFrame(biparts_tree1).T
-        df.columns = ['posterior', 'height_raw', 'height_corrected', 'bip', 'subtree']
-        print("Number of bipartitions with posterior > {} in tree1 = {}".format(str(args.posterior_threshold),df[df['posterior']>args.posterior_threshold].shape[0]))
+        for bip_function, text in zip([get_common_biparts_old, get_common_biparts], [""," (no nested nodes)"]):
+        
+        
+            heights_bip_nothr, subtrees_bip_nothr = bip_function(biparts_tree1, biparts_tree2)
+            
+            df = pd.DataFrame(biparts_tree1).T
+            df.columns = ['posterior', 'height_raw', 'height_corrected', 'bip', 'subtree']
+            if text == "":
+                print("Number of bipartitions in tree1 = {}".format(str(df.shape[0])))
+                print("Number of bipartitions with posterior > {} in tree1 = {}".format(str(args.posterior_threshold),df[df['posterior']>args.posterior_threshold].shape[0]))
 
-        if tree2_format == 'newick':
-            df2 = pd.DataFrame(biparts_tree2).T
-            df2.columns = ['support', 'bip']
-            print("Number of bipartitions with bootstrap > {} in tree2 = {}".format(str(args.threshold2), df2[df2['support']>args.threshold2].shape[0]))
-        else:
-            df2 = pd.DataFrame(biparts_tree2).T
-            df2.columns = ['posterior', 'height_raw', 'height_corrected', 'bip', 'subtree']
-            #print(df2)
-            print("Number of bipartitions with posterior > {} in tree2 = {}".format(str(args.threshold2),df2[df2['posterior']>args.threshold2].shape[0]))
+            if tree2_format == 'newick':
+                df2 = pd.DataFrame(biparts_tree2).T
+                df2.columns = ['support', 'bip']
+                bip_thr_tree2 = df2[df2['support']>args.threshold2].shape[0]
+                if text == "":
+                    print("Number of bipartitions with bootstrap > {} in tree2 = {}".format(str(args.threshold2), bip_thr_tree2))
+            else:
+                df2 = pd.DataFrame(biparts_tree2).T
+                df2.columns = ['posterior', 'height_raw', 'height_corrected', 'bip', 'subtree']
+                bip_thr_tree2 = df2[df2['posterior']>args.threshold2].shape[0]
+                if text == "":
+                    print("Number of bipartitions with posterior > {} in tree2 = {}".format(str(args.threshold2),bip_thr_tree2))
+            
+            print("\n")
+            print("Number of coinciding bipartitions"+ text +" in tree1 and tree2 with no thresholds {}".format(len(subtrees_bip_nothr)))
+            print("The median height of common bipartitions"+ text +" with no thresholds is {}".format(round(np.median(heights_bip_nothr),4)))
 
-        print("Number of coinciding bipartitions in tree1 and tree2 with no thresholds {}".format(len(subtrees_bip_nothr)))
-        print("The median height of common bipartitions with no thresholds is {}".format(round(np.median(heights_bip_nothr),4)))
-
-
-        heights_bip, subtrees_bip = get_common_biparts(biparts_tree1, biparts_tree2, args.posterior_threshold, args.threshold2)        
-        print("Number of coinciding bipartitions in tree1 and tree2 {}".format(len(subtrees_bip)))
-        print("The median height of common bipartitions is {}".format(round(np.median(heights_bip),4)))
-    
-    
+            print("\n")
+            heights_bip, subtrees_bip = bip_function(biparts_tree1, biparts_tree2, args.posterior_threshold, args.threshold2)        
+            print("Number of coinciding bipartitions"+ text +" in tree1 and tree2 {}".format(len(subtrees_bip)))
+            print("The median height of common bipartitions"+ text +" is {}".format(round(np.median(heights_bip),4)))
+            print("\n")
+            
+            if text == "":
+                biparts_values = biparts_values +  [df.shape[0],
+                                                    df[df['posterior']>args.posterior_threshold].shape[0],
+                                                    bip_thr_tree2,
+                                                    len(subtrees_bip_nothr),
+                                                    len(subtrees_bip),
+                                                    float(round(np.median(heights_bip_nothr),4)),
+                                                    float(round(np.median(heights_bip),4))]
+            else:
+                biparts_values = biparts_values +  [len(subtrees_bip_nothr),
+                                                    len(subtrees_bip),
+                                                    float(round(np.median(heights_bip_nothr),4)),
+                                                    float(round(np.median(heights_bip),4))]
     
         with open(os.path.join(args.output_dir,tree1_name + '_' + tree2_name + "_commontrees_bip.txt"), 'w') as file:
             file.write("\n".join(subtrees_bip) + "\n")
@@ -347,13 +397,20 @@ if __name__ == '__main__':
         print("Done")
 
         print("Comparing trees...")
+        
+        subtrees_values = []
+        heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2)
+        subtrees_values = subtrees_values + [len(subtrees), float(round(np.median(heights),4))]
+        
+        print("Number of coinciding subtrees (no thresholds) = {}".format(len(subtrees)))
+        print("The median height of common subtrees(no thresholds) is {}".format(round(np.median(heights),4)))
+        
+        
         if args.posterior_threshold:
             heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2,float(args.posterior_threshold))
-        else:
-            heights, subtrees = get_common_subtrees(tree1, subtree_times1, hashes_tree2)
-
-        print("Number of coinciding subtrees = {}".format(len(subtrees)))
-        print("The median height of common subtrees is {}".format(round(np.median(heights),4)))
+            print("Number of coinciding subtrees = {}".format(len(subtrees)))
+            print("The median height of common subtrees is {}".format(round(np.median(heights),4)))
+            subtrees_values = subtrees_values + [len(subtrees), float(round(np.median(heights),4))]
         
         with open(os.path.join(args.output_dir,tree1_name + '_' + tree2_name + "_commontrees.txt"), 'w') as file:
             file.write("\n".join(subtrees) + "\n")
@@ -362,29 +419,48 @@ if __name__ == '__main__':
         with open(os.path.join(args.output_dir, tree1_name + '_' + tree2_name + "_heights.txt"), 'w') as file:
             file.write("\n".join([str(h) for h in heights]) + "\n")
         file.close()
+
     if args.method == 'all':
         if tree2_format == 'nexus':
-            header = "tree1,tree2,bipartitions,bipartitions1 posterior>{},bipartitions2 posterior>{},\
-            coinciding bipartitions no thr,coinciding bipartitions,coinciding subtrees,RF bipartitions no threshold,RF bipartitions,RF subtrees\n".format(args.posterior_threshold,args.threshold2)
-            bip_thr_tree2 = df2[df2['posterior']>args.threshold2].shape[0]
+            header = ",".join(["tree1",
+                                "tree2",
+                                "bipartitions",
+                                "bipartitions1 posterior>{}".format(args.posterior_threshold),
+                                "bipartitions2 posterior>{}".format(args.posterior_threshold),
+                                "coinciding bipartitions no threshold",
+                                "coinciding bipartitions",
+                                "RF bipartitions no threshold",
+                                "RF bipartitions",
+                                "coinciding bipartitions no threshold (no nested clades)",
+                                "coinciding bipartitions (no nested)",
+                                "RF bipartitions no threshold (no nested)",
+                                "RF bipartitions (no nested)",
+                                "coinciding subtrees no threshold",
+                                "RF subtrees no threshold",
+                                "coinciding subtrees",
+                                "RF subtrees\n"])
         else:
-            header = "tree1,tree2,bipartitions,bipartitions1 posterior>{},bipartitions2 bootstrap>{},\
-            coinciding bipartitions no thr,coinciding bipartitions,coinciding subtrees,RF bipartitions no threshold,RF bipartitions,RF subtrees\n".format(args.posterior_threshold,args.threshold2)
-            bip_thr_tree2 = df2[df2['support']>args.threshold2].shape[0]
-        list_values = [tree1_name,
-                            tree2_name,
-                            df.shape[0],
-                            df[df['posterior']>args.posterior_threshold].shape[0],
-                            bip_thr_tree2,
-                            len(subtrees_bip_nothr),
-                            len(subtrees_bip),
-                            len(subtrees),
-                            round(np.median(heights_bip_nothr),4),
-                            round(np.median(heights_bip),4),
-                            round(np.median(heights),4)]
-                            
-        
+            header = ",".join(["tree1",
+                                "tree2",
+                                "bipartitions",
+                                "bipartitions1 posterior>{}".format(args.posterior_threshold),
+                                "bipartitions2 bootstrap>{}".format(args.threshold2),
+                                "coinciding bipartitions no threshold",
+                                "coinciding bipartitions",
+                                "RF bipartitions no threshold",
+                                "RF bipartitions",
+                                "coinciding bipartitions no threshold (no nested clades)",
+                                "coinciding bipartitions (no nested)",
+                                "RF bipartitions no threshold (no nested)",
+                                "RF bipartitions (no nested)",
+                                "coinciding subtrees no threshold",
+                                "RF subtrees no threshold",
+                                "coinciding subtrees",
+                                "RF subtrees\n"])
+
+        list_values = [tree1_name, tree2_name] + biparts_values + subtrees_values
+
         values = ",".join([str(x) for x in list_values]) + '\n'
-        
+
         with open(os.path.join(args.output_dir, tree1_name + '_' + tree2_name + "_table.csv"), 'w') as file:
             file.writelines([header, values])
