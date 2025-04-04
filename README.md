@@ -28,7 +28,7 @@ Applies both methods. Output a table with the following columns:
 - bipartitions1 posterior>threshold - number of non-trivial branches in the first tree with posterior higher than a threshold
 - bipartitions2 bootstrap>threshold2 - number of non-trivial branches in the second tree with posterior/bootstrap support higher than a threshold
 - coinciding bipartitions no threshold - number of coinciding non-trivial branches in two trees
-- coinciding bipartitions" - number of coinciding non-trivial branches with posterior/bootstrap support higher than threshold in two trees
+- coinciding bipartitions - number of coinciding non-trivial branches with posterior/bootstrap support higher than threshold in two trees
 - RF times/bipartitions no threshold - median ages of recombinant forms (common subtrees) calculated from common bipartitions 
 - RF times/bipartitions - median ages of recombinant forms (common subtrees) calculated from common bipartitions with posterior/bootstrap support higher than a threshold
 - coinciding bipartitions no threshold (no nested clades) - number of coinciding non-trivial branches in two trees, nested clades are deleted
@@ -38,7 +38,7 @@ Applies both methods. Output a table with the following columns:
 - coinciding subtrees no threshold - number of coinciding subtrees
 - RF times/subtrees no threshold - median ages of recombinant forms (common subtrees) 
 - coinciding subtrees - number of coinciding subtrees with posterior supports in the first tree higher than a threshold
-- RF times/subtrees" - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold
+- RF times/subtrees - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold
 ```
 
 
