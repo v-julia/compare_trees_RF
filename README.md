@@ -21,7 +21,7 @@ Taxa in two trees must coincide.
 
 3) all
 Applies both methods. Output a table with the following columns:
-
+```
 - tree1 - Name of file with the first tree without file extension
 - tree2 - Name of file with the second tree without file extension
 - bipartitions - number of non-trivial branches in the first tree
@@ -39,7 +39,7 @@ Applies both methods. Output a table with the following columns:
 - RF times/subtrees no threshold - median ages of recombinant forms (common subtrees) 
 - coinciding subtrees - number of coinciding subtrees with posterior supports in the first tree higher than a threshold
 - RF times/subtrees" - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold
-
+```
 
 
 Usage
