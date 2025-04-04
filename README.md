@@ -5,16 +5,47 @@ Functions for identifing and visualizing common subtrees in two phylogenetic tre
 
 
 ## get_RF_halflife.py
+This script provides two methods to compare two trees and calculate median ages of coinciding nodes ("method" parameter).
 
-This script finds common subtrees between two trees and calculates median of their MRCA ages. The subtrees' tMRCA are extracted from the first tree which should be a time-scaled phylogeny produced by BEAST software. The second tree's format could be nexus or newick. Output:
+1) subtrees
+Finds common subtrees between two trees and calculates median of their MRCA ages. The nodes' tMRCA are extracted from the first tree. This tree should be a time-scaled phylogeny produced by BEAST software. The second tree's format could be nexus or newick. Output:
 - *_commontrees.txt - text file with common subtrees in newick format
 - *_heights.txt - ages of common subtrees
+Importantly, this method allows the trees' taxa not to coincide. 
+  
+2) bipartitions
+Finds common bipartitions, or non-trivial branches between two trees, calculates median ages of nodes that correspond to bipartitions. The nodes' tMRCA are extracted from the first tree. This tree should be a time-scaled phylogeny produced by BEAST software. The second tree's format could be nexus or newick. Output:
+- *_commontrees_bip.txt - text file with common subtrees in newick format. Nested nodes are removed.
+- *_heights_bip.txt - ages of common subtrees. Nested nodes are removed.
+Taxa in two trees must coincide. 
 
-Importantly, the trees' taxa should not necessarily coincide. 
+3) all
+Applies both methods. Output a table with the following columns:
+
+- tree1 - Name of file with the first tree without file extension
+- tree2 - Name of file with the second tree without file extension
+- bipartitions - number of non-trivial branches in the first tree
+- bipartitions1 posterior>threshold - number of non-trivial branches in the first tree with posterior higher than a threshold
+- bipartitions2 bootstrap>threshold2 - number of non-trivial branches in the second tree with posterior/bootstrap support higher than a threshold
+- coinciding bipartitions no threshold - number of coinciding non-trivial branches in two trees
+- coinciding bipartitions" - number of coinciding non-trivial branches with posterior/bootstrap support higher than threshold in two trees
+- RF times/bipartitions no threshold - median ages of recombinant forms (common subtrees) calculated from common bipartitions 
+- RF times/bipartitions - median ages of recombinant forms (common subtrees) calculated from common bipartitions with posterior/bootstrap support higher than a threshold
+- coinciding bipartitions no threshold (no nested clades) - number of coinciding non-trivial branches in two trees, nested clades are deleted
+- coinciding bipartitions (no nested) -  number of coinciding non-trivial branches with posterior/bootstrap support higher than threshold in two trees, nested clades are deleted
+- RF times/bipartitions no threshold (no nested) - median ages of recombinant forms (common subtrees) calculated from common bipartitions, nested clades are deleted
+- RF times/bipartitions (no nested) - median ages of recombinant forms (common subtrees) calculated from common bipartitions with posterior/bootstrap support higher than threshold, nested clades are deleted
+- coinciding subtrees no threshold - number of coinciding subtrees
+- RF times/subtrees no threshold - median ages of recombinant forms (common subtrees) 
+- coinciding subtrees - number of coinciding subtrees with posterior supports in the first tree higher than a threshold
+- RF times/subtrees" - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold
+
+
 
 Usage
 ```
-get_RF_halflife.py [-h] -tree1 TREE_BEAST -tree2 TREE2 [-pthr POSTERIOR_THRESHOLD]
+get_RF_halflife.py [-h] -tree1 TREE_BEAST -tree2 TREE2 -method METHOD [-thr POSTERIOR_THRESHOLD]
+                          [-thr2 THRESHOLD2] [-out OUTPUT_DIR]
 
 options:
   -h, --help            show this help message and exit
