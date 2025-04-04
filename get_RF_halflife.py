@@ -429,16 +429,16 @@ if __name__ == '__main__':
                                 "bipartitions2 posterior>{}".format(args.posterior_threshold),
                                 "coinciding bipartitions no threshold",
                                 "coinciding bipartitions",
-                                "RF bipartitions no threshold",
-                                "RF bipartitions",
+                                "RF times/bipartitions no threshold",
+                                "RF times/bipartitions",
                                 "coinciding bipartitions no threshold (no nested clades)",
                                 "coinciding bipartitions (no nested)",
-                                "RF bipartitions no threshold (no nested)",
-                                "RF bipartitions (no nested)",
+                                "RF times/bipartitions no threshold (no nested)",
+                                "RF times/bipartitions (no nested)",
                                 "coinciding subtrees no threshold",
-                                "RF subtrees no threshold",
+                                "RF times/subtrees no threshold",
                                 "coinciding subtrees",
-                                "RF subtrees\n"])
+                                "RF times/subtrees\n"])
         else:
             header = ",".join(["tree1",
                                 "tree2",
