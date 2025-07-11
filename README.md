@@ -15,6 +15,7 @@ Importantly, this method allows the trees' taxa not to coincide.
 
 
 <img src=https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_subtrees_scheme.png" align="center" width=500/>
+
 Figure 1. Scheme of "subtrees" method.
 2) bipartitions
 Finds common bipartitions, or non-trivial branches between two trees, calculates median ages of nodes that correspond to bipartitions. The nodes' tMRCA are extracted from the first tree. This tree should be a time-scaled phylogeny produced by BEAST software. The second tree's format could be nexus or newick. Output:
@@ -23,6 +24,7 @@ Finds common bipartitions, or non-trivial branches between two trees, calculates
 Taxa in two trees must coincide. 
 
 <img src=https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_bipartitions_scheme.png" align="center" width=500/>
+
 Figure 2. Scheme of "bipartitions" method.
 3) all
 Applies both methods. Output a table with the following columns:
