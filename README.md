@@ -14,7 +14,7 @@ Finds common subtrees between two trees and calculates median of their MRCA ages
 Importantly, this method allows the trees' taxa not to coincide. 
 
 
-<img src=https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_subtrees_scheme.png" align="center" width=500/>
+<img src="https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_subtrees_scheme.png" align="center" width=500/>
 
 Figure 1. Scheme of "subtrees" method.
 2) bipartitions
@@ -23,7 +23,7 @@ Finds common bipartitions, or non-trivial branches between two trees, calculates
 - *_heights_bip.txt - ages of common subtrees. Nested nodes are removed.
 Taxa in two trees must coincide. 
 
-<img src=https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_bipartitions_scheme.png" align="center" width=500/>
+<img src="https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_bipartitions_scheme.png" align="center" width=500/>
 
 Figure 2. Scheme of "bipartitions" method.
 3) all
