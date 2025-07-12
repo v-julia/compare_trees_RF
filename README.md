@@ -48,6 +48,10 @@ Applies both methods. Output a table with the following columns:
 - RF times/subtrees no threshold - median ages of recombinant forms (common subtrees) 
 - coinciding subtrees - number of coinciding subtrees with posterior supports in the first tree higher than a threshold
 - RF times/subtrees - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold
+- coinciding subtrees (thr while encoding) - number of coinciding subtrees with posterior supports in the first tree higher than a threshold. The nodes with supports lower than `thr` and `thr2` where not considered while encoding the tree.
+- RF times/subtrees(thr while encoding) - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold. The nodes with supports lower than `thr` and `thr2` where not considered while encoding the tree.
+
+
 ```
 
 
