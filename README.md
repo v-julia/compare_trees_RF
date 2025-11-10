@@ -1,7 +1,7 @@
 # compare_trees_RF
 compare phylogenetic trees and calculate TMRCAs of recombinant forms 
 
-Functions for identifing and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
+Functions for identifying and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
 
 
 ## get_RF_halflife.py
