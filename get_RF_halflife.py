@@ -567,7 +567,10 @@ if __name__ == '__main__':
         try:
             tree2 = dpy.Tree.get_from_path(args.tree2, 'newick')
             tree2_format = 'newick'
-            tree2.reroot_at_midpoint()
+            try:
+                tree2.reroot_at_midpoint()
+            except:
+                print("Tree is already rooted by midpoint")
         except:
             print("Couldn't read tree2!")
             sys.exit(1)
