@@ -1,7 +1,8 @@
-# compare_trees_RF
-compare phylogenetic trees and calculate TMRCAs of recombinant forms 
+# RF-HL (calculate Recombinant Forms' Half-life)
 
-Functions for identifying and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
+RF-HL is a tool for estimating the half-life of virus recombinant forms. 
+
+This repository contains functions for identifying and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
 
 
 ## get_RF_halflife.py
