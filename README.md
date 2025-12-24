@@ -1,7 +1,7 @@
 # compare_trees_RF
 compare phylogenetic trees and calculate TMRCAs of recombinant forms 
 
-Functions for identifing and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
+Functions for identifying and visualizing common subtrees in two phylogenetic trees. One of the trees should be a time-scaled phylogeny produced by BEAST.
 
 
 ## get_RF_halflife.py
@@ -12,12 +12,21 @@ Finds common subtrees between two trees and calculates median of their MRCA ages
 - *_commontrees.txt - text file with common subtrees in newick format
 - *_heights.txt - ages of common subtrees
 Importantly, this method allows the trees' taxa not to coincide. 
-  
+
+
+<img src="https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_subtrees_scheme.png" align="center" width=1200/>
+
+Figure 1. Scheme of "subtrees" method.
+
 2) bipartitions
 Finds common bipartitions, or non-trivial branches between two trees, calculates median ages of nodes that correspond to bipartitions. The nodes' tMRCA are extracted from the first tree. This tree should be a time-scaled phylogeny produced by BEAST software. The second tree's format could be nexus or newick. Output:
 - *_commontrees_bip.txt - text file with common subtrees in newick format. Nested nodes are removed.
 - *_heights_bip.txt - ages of common subtrees. Nested nodes are removed.
 Taxa in two trees must coincide. 
+
+<img src="https://github.com/v-julia/compare_trees_RF/blob/main/images/Common_bipartitions_scheme.png" align="center" width=1200/>
+
+Figure 2. Scheme of "bipartitions" method.
 
 3) all
 Applies both methods. Output a table with the following columns:
@@ -39,6 +48,10 @@ Applies both methods. Output a table with the following columns:
 - RF times/subtrees no threshold - median ages of recombinant forms (common subtrees) 
 - coinciding subtrees - number of coinciding subtrees with posterior supports in the first tree higher than a threshold
 - RF times/subtrees - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold
+- coinciding subtrees (thr while encoding) - number of coinciding subtrees with posterior supports in the first tree higher than a threshold. The nodes with supports lower than `thr` and `thr2` where not considered while encoding the tree.
+- RF times/subtrees(thr while encoding) - median ages of recombinant forms (common subtrees) with posterior supports in the first tree higher than a threshold. The nodes with supports lower than `thr` and `thr2` where not considered while encoding the tree.
+
+
 ```
 
 
