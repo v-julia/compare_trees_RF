@@ -27,11 +27,19 @@ tree1 = read.beast(tree1_name)
 tree2_name = "norovirus_rdrp_g2.tree"
 tree2 = read.beast(tree2_name)
 
+
+
 # Plot beast subtree and color braches of common subtrees
+
+# for MCC tree we have to change "label" to posterior
+# here we mark nodes with posterior>0.9 with black point
 p1 = ggtree(tree1,mrsd="2025-01-01") +  geom_tiplab(size=2) + 
-            geom_label2(aes(label=round(as.numeric(posterior),2)),size=2)
+            geom_point2(aes(label=posterior, 
+                  subset = !is.na(as.numeric(posterior)) & as.numeric(posterior) > 0.9), size=1, color="black")
+            #geom_label2(aes(label=round(as.numeric(posterior),2)),size=2)
 p1 = groupOTU(p1, subtrees, 'Clade') + aes(color=Clade) +
   theme(legend.position="right") + scale_color_manual(values=c("black", "firebrick"))
+p1
 
 p2 = ggtree(tree2,mrsd="2025-01-01") +  geom_tiplab(size=2) + 
             geom_label2(aes(label=round(as.numeric(posterior),2)),size=2)
